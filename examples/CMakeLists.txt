@@ -6,7 +6,7 @@ set(CMAKE_CXX_STANDARD 11)
 find_package(Poco 1.4.3 REQUIRED COMPONENTS Net Util Foundation XML)
 
 set(SRC_FILES
-    test.cpp)
+    ex01.cpp)
 
 include_directories(include
                     ../include/abb_librws/
