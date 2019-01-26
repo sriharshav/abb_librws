@@ -101,20 +101,20 @@ std::string xmlFindTextContent(const Poco::XML::Node* p_node, const XMLAttribute
       bool found = false;
       if (p_node->hasChildNodes())
       {
-        Poco::XML::NodeList* children = p_node->childNodes();
+        Poco::AutoPtr<Poco::XML::NodeList> p_children(p_node->childNodes());
 
-        for (unsigned long i = 0; i < children->length() && !found; i++)
+        for (unsigned long i = 0; i < p_children->length() && !found; i++)
         {
-          Poco::XML::Node* child = children->item(i);
+          Poco::XML::Node* p_child = p_children->item(i);
 
-          if (child->nodeType() == Poco::XML::Node::TEXT_NODE && xmlNodeHasAttribute(child->parentNode(), attribute))
+          if (p_child->nodeType() == Poco::XML::Node::TEXT_NODE && xmlNodeHasAttribute(p_child->parentNode(), attribute))
           {
             found = true;
-            result = child->nodeValue();
+            result = p_child->nodeValue();
           }
           else
           {
-            result = xmlFindTextContent(child, attribute);
+            result = xmlFindTextContent(p_child, attribute);
             found = !result.empty();
           }
         }
@@ -131,13 +131,13 @@ bool xmlNodeHasAttribute(const Poco::XML::Node* p_node, const XMLAttribute attri
 
   if(!found && p_node && p_node->hasAttributes())
   {
-    Poco::XML::NamedNodeMap* attributes = p_node->attributes();
+    Poco::AutoPtr<Poco::XML::NamedNodeMap> p_attributes(p_node->attributes());
 
-    for (unsigned long i = 0; i < attributes->length() && !found; i++)
+    for (unsigned long i = 0; i < p_attributes->length() && !found; i++)
     {
-      Poco::XML::Node* temp_attribute = attributes->item(i);
+      Poco::XML::Node* p_attribute = p_attributes->item(i);
 
-      if (temp_attribute->nodeName() == attribute.name && temp_attribute->nodeValue() == attribute.value)
+      if (p_attribute->nodeName() == attribute.name && p_attribute->nodeValue() == attribute.value)
       {
         found = true;
       }
@@ -165,18 +165,19 @@ const std::string SystemConstants::ContollerStates::CONTROLLER_MOTOR_OFF      = 
 const std::string SystemConstants::ContollerStates::PANEL_OPERATION_MODE_AUTO = "AUTO";
 const std::string SystemConstants::ContollerStates::RAPID_EXECUTION_RUNNING   = "running";
 
-const std::string SystemConstants::General::EXTERNAL_APPLICATION  = "ExternalApplication";
-const std::string SystemConstants::General::EXTERNAL_LOCATION     = "ExternalLocation";
-const std::string SystemConstants::General::DEFAULT_PASSWORD      = "robotics";
-const std::string SystemConstants::General::DEFAULT_USERNAME      = "Default User";
-const std::string SystemConstants::General::LOCAL                 = "local";
-const std::string SystemConstants::General::MECHANICAL_UNIT_ROB_1 = "ROB_1";
-const std::string SystemConstants::General::MECHANICAL_UNIT_ROB_2 = "ROB_2";
-const std::string SystemConstants::General::MECHANICAL_UNIT_ROB_3 = "ROB_3";
-const std::string SystemConstants::General::MECHANICAL_UNIT_ROB_4 = "ROB_4";
-const std::string SystemConstants::General::MECHANICAL_UNIT_ROB_L = "ROB_L";
-const std::string SystemConstants::General::MECHANICAL_UNIT_ROB_R = "ROB_R";
-const std::string SystemConstants::General::REMOTE                = "remote";
+const std::string SystemConstants::General::EXTERNAL_APPLICATION   = "ExternalApplication";
+const std::string SystemConstants::General::EXTERNAL_LOCATION      = "ExternalLocation";
+const unsigned short SystemConstants::General::DEFAULT_PORT_NUMBER = 80;
+const std::string SystemConstants::General::DEFAULT_PASSWORD       = "robotics";
+const std::string SystemConstants::General::DEFAULT_USERNAME       = "Default User";
+const std::string SystemConstants::General::LOCAL                  = "local";
+const std::string SystemConstants::General::MECHANICAL_UNIT_ROB_1  = "ROB_1";
+const std::string SystemConstants::General::MECHANICAL_UNIT_ROB_2  = "ROB_2";
+const std::string SystemConstants::General::MECHANICAL_UNIT_ROB_3  = "ROB_3";
+const std::string SystemConstants::General::MECHANICAL_UNIT_ROB_4  = "ROB_4";
+const std::string SystemConstants::General::MECHANICAL_UNIT_ROB_L  = "ROB_L";
+const std::string SystemConstants::General::MECHANICAL_UNIT_ROB_R  = "ROB_R";
+const std::string SystemConstants::General::REMOTE                 = "remote";
 
 const std::string SystemConstants::IOSignals::HAND_ACTUAL_POSITION_L   = "hand_ActualPosition_L";
 const std::string SystemConstants::IOSignals::HAND_ACTUAL_POSITION_R   = "hand_ActualPosition_R";
