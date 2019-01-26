@@ -50,167 +50,6 @@ class RWSInterface
 {
 public:
   /**
-   * \brief A struct for a tri value bool.
-   */
-  struct TriBool
-  {
-    /**
-     * \brief An enum for the different accepted values.
-     */
-    enum Values
-    {
-      UNKNOWN_VALUE, ///< Unknown value. E.g. in case of communication failure.
-      TRUE_VALUE,    ///< True value.
-      FALSE_VALUE    ///< False value.
-    };
-    
-    /**
-     * \brief A default constructor.
-     */
-    TriBool() : value(UNKNOWN_VALUE) {}
-    
-    /**
-     * \brief A constructor.
-     *
-     * \param value for the initial true or false value.
-     */
-    TriBool(const bool initial_value) : value(initial_value ? TRUE_VALUE : FALSE_VALUE) {}
-
-    /**
-     * \brief Operator for conversion to a bool.
-     *
-     * \return bool returns true if the value is TRUE_VALUE, otherwise false.
-     */
-    operator bool() const
-    {
-      return value == TRUE_VALUE;
-    }
-    
-    /**
-     * \brief Operator for copy assignment.
-     *
-     * \param rhs for right hand side value.
-     *
-     * \return TriBool& self.
-     */
-    TriBool& operator=(const TriBool& other)
-    {
-      if (&other == this)
-      {
-        return *this;
-      }
-
-      value = other.value;
-
-      return *this;
-    }
-    
-    /**
-     * \brief Operator for assignment.
-     *
-     * \param rhs for right hand side value.
-     *
-     * \return TriBool& self.
-     */
-    TriBool& operator=(const Values& rhs)
-    {
-      value = rhs;
-
-      return *this;
-    }
-    
-    /**
-     * \brief Operator for assignment.
-     *
-     * \param rhs for right hand side value.
-     *
-     * \return TriBool& self.
-     */
-    TriBool& operator=(const bool& rhs)
-    {
-      value = (rhs ? TRUE_VALUE : FALSE_VALUE);
-
-      return *this;
-    }
-
-    /**
-     * \brief Operator for equal to comparison.
-     *
-     * \param rhs for right hand side value.
-     *
-     * \return bool indicating if the comparision was equal or not.
-     */
-    bool operator==(const TriBool& rhs) const
-    {
-      return value == rhs.value;
-    }
-    
-    /**
-     * \brief Operator for equal to comparison.
-     *
-     * \param rhs for right hand side value.
-     *
-     * \return bool indicating if the comparision was equal or not.
-     */
-    bool operator==(const Values& rhs) const
-    {
-      return value == rhs;
-    }
-
-    /**
-     * \brief Operator for not equal to comparison.
-     *
-     * \param rhs for right hand side value.
-     *
-     * \return bool indicating if the comparision was not equal or not.
-     */
-    bool operator!=(const TriBool& rhs) const
-    {
-      return value != rhs.value;
-    }
-    
-    /**
-     * \brief Operator for not equal to comparison.
-     *
-     * \param rhs for right hand side value.
-     *
-     * \return bool indicating if the comparision was not equal or not.
-     */
-    bool operator!=(const Values& rhs) const
-    {
-      return value != rhs;
-    }
-
-    /**
-     * \brief Operator for stream insertion.
-     *
-     * \param stream for the output stream.
-     * \param rhs for the right hand side value, to insert into the output stream.
-     *
-     * \return std::ostream& for the output stream.
-     */
-    friend std::ostream& operator<<(std::ostream& stream, const TriBool& rhs)
-    {
-      return stream << rhs.toString();
-    }
-
-    /**
-     * \brief A method for converting the tri bool to a text string.
-     *
-     * \return std::string containing the string representation of the value.
-     */
-    std::string toString() const
-    {
-      return (value == UNKNOWN_VALUE ? "unknown" : (value == TRUE_VALUE ? "true" : "false"));
-    }
-
-    /**
-     * \brief The tri bool value.
-     */
-    Values value;
-  };
-  
-  /**
    * \brief A struct for containing system information of the robot controller.
    */
   struct SystemInfo
@@ -305,10 +144,63 @@ public:
    * \brief A constructor.
    *
    * \param ip_address specifying the robot controller's IP address.
-   * \param port specifying the robot controller's RWS server's port number.
    */
-  RWSInterface(const std::string ip_address, const unsigned short port = 80);
+  RWSInterface(const std::string ip_address)
+  :
+  rws_client_(ip_address,
+              SystemConstants::General::DEFAULT_PORT_NUMBER,
+              SystemConstants::General::DEFAULT_USERNAME,
+              SystemConstants::General::DEFAULT_PASSWORD)
+  {}
   
+  /**
+   * \brief A constructor.
+   *
+   * \param ip_address specifying the robot controller's IP address.
+   * \param username for the username to the RWS authentication process.
+   * \param password for the password to the RWS authentication process.
+   */
+  RWSInterface(const std::string ip_address, const std::string username, const std::string password)
+  :
+  rws_client_(ip_address,
+              SystemConstants::General::DEFAULT_PORT_NUMBER,
+              username,
+              password)
+  {}
+
+  /**
+   * \brief A constructor.
+   *
+   * \param ip_address specifying the robot controller's IP address.
+   * \param port for the port used by the RWS server.
+   */
+  RWSInterface(const std::string ip_address, const unsigned short port)
+  :
+  rws_client_(ip_address,
+              port,
+              SystemConstants::General::DEFAULT_USERNAME,
+              SystemConstants::General::DEFAULT_PASSWORD)
+  {}
+
+  /**
+   * \brief A constructor.
+   *
+   * \param ip_address specifying the robot controller's IP address.
+   * \param port for the port used by the RWS server.
+   * \param username for the username to the RWS authentication process.
+   * \param password for the password to the RWS authentication process.
+   */
+  RWSInterface(const std::string ip_address,
+               const unsigned short port,
+               const std::string username,
+               const std::string password)
+  :
+  rws_client_(ip_address,
+              port,
+              username,
+              password)
+  {}
+
   /**
    * \brief A method for collecting runtime information of the robot controller.
    *
@@ -527,9 +419,16 @@ public:
    * \return bool indicating if the communication was successful or not.
    */
   bool startSubscription(const RWSClient::SubscriptionResources resources);
-      
+
   /**
-   * \brief A method for waiting for a subscription event.
+   * \brief A method for waiting for a subscription event (use if the event content is irrelevant).
+   *
+   * \return bool indicating if the communication was successful or not.
+   */
+  bool waitForSubscriptionEvent();
+
+  /**
+   * \brief A method for waiting for a subscription event (use if the event content is important). 
    *
    * \param p_xml_document for storing the data received in the subscription event.
    *
