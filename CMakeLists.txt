@@ -60,3 +60,5 @@ if (WITH_ROS)
                 DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
                 FILES_MATCHING PATTERN "*.h")
 endif()
+
+add_subdirectory(examples)
