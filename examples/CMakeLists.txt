@@ -1,2 +1,3 @@
 add_subdirectory(static_runtime_info)
 add_subdirectory(set_variable)
+add_subdirectory(subscription)
